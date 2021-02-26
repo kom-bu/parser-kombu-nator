@@ -1,20 +1,20 @@
-interface parseNode {
+export interface parseNode {
     label: string;
     children: parseNode[]
 }
 
-type parseTarget = { string: string; cursorPos: number }
-type parseResult = { newCursorPos: number; syntaxTree: parseNode }
-type parser = (parseTarget: parseTarget) => parseResult[];
+export type parseTarget = { string: string; cursorPos: number }
+export type parseResult = { newCursorPos: number; syntaxTree: parseNode }
+export type parser = (parseTarget: parseTarget) => parseResult[];
 
-function publish(parser: parser): (string: string) => parseNode[] {
+export function publish(parser: parser): (string: string) => parseNode[] {
     return (string: string) =>
         parser({string: string, cursorPos: 0})
             .filter(parseResult => string.length === parseResult.newCursorPos)
             .map(parseResult => parseResult.syntaxTree);
 }
 
-function union(...elementParsers: parser[]): parser {
+export function union(...elementParsers: parser[]): parser {
     return ({string: string, cursorPos: cursorPos}) => {
         let parseResults: parseResult[] = [];
         elementParsers.forEach(elementParser => {
@@ -23,7 +23,7 @@ function union(...elementParsers: parser[]): parser {
         return parseResults;
     };
 }
-function unionSpread(...elementParsersSpread: parserSpread[]): parserSpread {
+export function unionSpread(...elementParsersSpread: parserSpread[]): parserSpread {
     return ({string: string, cursorPos: cursorPos}) => {
         let parseResultsSpread: parseResultSpread[] = [];
         elementParsersSpread.forEach(elementParser => {
@@ -33,9 +33,9 @@ function unionSpread(...elementParsersSpread: parserSpread[]): parserSpread {
     };
 }
 
-type parseResultSpread = { newCursorPos: number; syntaxTreeSpread: parseNode[] }
-type parserSpread = (parseTarget: parseTarget) => parseResultSpread[];
-function seq(...elementParsers: (parser | parserSpread)[]): parserSpread { // use as if ...symb (but no label)
+export type parseResultSpread = { newCursorPos: number; syntaxTreeSpread: parseNode[] }
+export type parserSpread = (parseTarget: parseTarget) => parseResultSpread[];
+export function seq(...elementParsers: (parser | parserSpread)[]): parserSpread { // use as if ...symb (but no label)
     return ({string: string, cursorPos: cursorPos}) => {
         let accumuratedParseResults: { newCursorPos: number; trees: parseNode[] }[] = [{
             newCursorPos: cursorPos,
@@ -65,7 +65,7 @@ function seq(...elementParsers: (parser | parserSpread)[]): parserSpread { // us
         );
     };
 }
-function seqLazy(...elementParsersPacked: (() => (parser | parserSpread))[]): parserSpread {
+export function seqLazy(...elementParsersPacked: (() => (parser | parserSpread))[]): parserSpread {
     return ({string: string, cursorPos: cursorPos}) => {
         let accumuratedParseResults: { newCursorPos: number; trees: parseNode[] }[] = [{
             newCursorPos: cursorPos,
@@ -96,7 +96,7 @@ function seqLazy(...elementParsersPacked: (() => (parser | parserSpread))[]): pa
     };
 }
 
-function symb(label: string, ...elementParsers: (parser | parserSpread)[]): parser {
+export function symb(label: string, ...elementParsers: (parser | parserSpread)[]): parser {
     return ({string: string, cursorPos: cursorPos}) => 
         seq(...elementParsers)({string: string, cursorPos: cursorPos})
             .map(parseResultSpread => ({
@@ -108,11 +108,11 @@ function symb(label: string, ...elementParsers: (parser | parserSpread)[]): pars
 const noop: parser = ({string: string, cursorPos: cursorPos}) =>
         [{ newCursorPos: cursorPos, syntaxTree: { label: '', children: [] } }];
 
-function maybe(parser: parser): parser{
+export function maybe(parser: parser): parser{
     return union(noop, parser)
 }
 
-function _char(char: string): parser {
+export function _char(char: string): parser {
     return ({string: string, cursorPos: cursorPos}) => {
         const nextchar = string[cursorPos];
         if (nextchar === char)
@@ -120,10 +120,10 @@ function _char(char: string): parser {
         else return [];
     };
 }
-function char(...chars: string[]): parser {
+export function char(...chars: string[]): parser {
     return union(...chars.map(char => _char(char)));
 }
 
-function repeated(parser: parser): parserSpread { //maybe 0 times
+export function repeated(parser: parser): parserSpread { //maybe 0 times
     return unionSpread(seq(), seqLazy(() => parser, () => repeated(parser)));
 }

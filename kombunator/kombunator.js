@@ -1,10 +1,9 @@
-"use strict";
-function publish(parser) {
+export function publish(parser) {
     return (string) => parser({ string: string, cursorPos: 0 })
         .filter(parseResult => string.length === parseResult.newCursorPos)
         .map(parseResult => parseResult.syntaxTree);
 }
-function union(...elementParsers) {
+export function union(...elementParsers) {
     return ({ string: string, cursorPos: cursorPos }) => {
         let parseResults = [];
         elementParsers.forEach(elementParser => {
@@ -13,7 +12,7 @@ function union(...elementParsers) {
         return parseResults;
     };
 }
-function unionSpread(...elementParsersSpread) {
+export function unionSpread(...elementParsersSpread) {
     return ({ string: string, cursorPos: cursorPos }) => {
         let parseResultsSpread = [];
         elementParsersSpread.forEach(elementParser => {
@@ -22,7 +21,7 @@ function unionSpread(...elementParsersSpread) {
         return parseResultsSpread;
     };
 }
-function seq(...elementParsers) {
+export function seq(...elementParsers) {
     return ({ string: string, cursorPos: cursorPos }) => {
         let accumuratedParseResults = [{
                 newCursorPos: cursorPos,
@@ -50,7 +49,7 @@ function seq(...elementParsers) {
         }));
     };
 }
-function seqLazy(...elementParsersPacked) {
+export function seqLazy(...elementParsersPacked) {
     return ({ string: string, cursorPos: cursorPos }) => {
         let accumuratedParseResults = [{
                 newCursorPos: cursorPos,
@@ -78,7 +77,7 @@ function seqLazy(...elementParsersPacked) {
         }));
     };
 }
-function symb(label, ...elementParsers) {
+export function symb(label, ...elementParsers) {
     return ({ string: string, cursorPos: cursorPos }) => seq(...elementParsers)({ string: string, cursorPos: cursorPos })
         .map(parseResultSpread => ({
         newCursorPos: parseResultSpread.newCursorPos,
@@ -86,10 +85,10 @@ function symb(label, ...elementParsers) {
     }));
 }
 const noop = ({ string: string, cursorPos: cursorPos }) => [{ newCursorPos: cursorPos, syntaxTree: { label: '', children: [] } }];
-function maybe(parser) {
+export function maybe(parser) {
     return union(noop, parser);
 }
-function _char(char) {
+export function _char(char) {
     return ({ string: string, cursorPos: cursorPos }) => {
         const nextchar = string[cursorPos];
         if (nextchar === char)
@@ -98,9 +97,9 @@ function _char(char) {
             return [];
     };
 }
-function char(...chars) {
+export function char(...chars) {
     return union(...chars.map(char => _char(char)));
 }
-function repeated(parser) {
+export function repeated(parser) {
     return unionSpread(seq(), seqLazy(() => parser, () => repeated(parser)));
 }

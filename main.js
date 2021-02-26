@@ -1,4 +1,4 @@
-"use strict";
+import * as kombu from "./kombunator/kombunator.js";
 function parseOut() {
     const inArea = document.getElementById("in");
     if (inArea === null || !(inArea instanceof HTMLTextAreaElement)) {
@@ -14,7 +14,7 @@ function parseOut() {
     //outArea.value = publish(symb("label", char("a"), seq(char("b"), seq(char("c"), char("d")))))(inArea.value)
     //outArea.value = publish(symb("label", seq(char("a"), char("a"))))(inArea.value)
     //outArea.value = publish(union(char("a"), char("b")))(inArea.value)
-    outArea.value = publish(symb("test", repeated(char(..."1234567890"))))(inArea.value)
+    outArea.value = kombu.publish(kombu.symb("test", kombu.repeated(kombu.char(..."1234567890"))))(inArea.value)
         .map(result => JSON.stringify(result, null, "  "))
         .join("\n\n");
     /*
@@ -27,3 +27,11 @@ function parseOut() {
     //outArea.value = JSON.stringify(parseSeq("double digit", parseDigit, parseDigit)(startParse(inArea.value)));
     //outArea.value += JSON.stringify(parseDigit(startParse(inArea.value)));
 }
+alert("kyomu");
+window.onload = () => {
+    alert("gue");
+    const parse_button = document.getElementById("parse button");
+    if (parse_button === null)
+        return;
+    parse_button.addEventListener("click", parseOut);
+};
