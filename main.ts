@@ -27,9 +27,7 @@ function parseOut() : void {
     //outArea.value = JSON.stringify(parseSeq("double digit", parseDigit, parseDigit)(startParse(inArea.value)));
     //outArea.value += JSON.stringify(parseDigit(startParse(inArea.value)));
 }
-alert("kyomu");
 window.onload = () => {
-    alert("gue")
     const parse_button = document.getElementById("parse button");
     if (parse_button === null) return;
     parse_button.addEventListener("click", parseOut)
